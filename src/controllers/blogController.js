@@ -76,7 +76,7 @@ const getBlogs= async function (req,res){
     }
     else{
         let data= await blogModel.find({$and:[{isDeleted:false},{isPublished:true}]})
-        if(!data) return res.status(400).send({msg:"The author Id that you have entered has no data which is published or not deleted"})
+        if(!data) return res.status(404).send({msg:"The author Id that you have entered has no data which is published or not deleted"})
         res.status(200).send({msg:"true",data:data})
     }
 }
@@ -136,19 +136,20 @@ const deleteBlog = async function(req,res){
 ///////////////////////////////////////////////// deleteBlogByQuery
 
 const deleteBlogByQuery= async function(req,res){
-    try{
-        let query= req.query
-        let find=await blogModel.find(query)
-        if(!find) return res.status(400).send({msg:"The Query You have Entered Is Invalid"})
-        if(find.isDeleted==true) return res.send(400).status({msg:"The data Belong To Your Query Is already deleted"})
-        let date=new Date().toISOString()
-        await blogModel.findOneAndUpdate({query:query},{$set:{isDeleted:true,deletedAt:date}})
-        res.status(200).send({msg:"Successfully Deleted"})
-
-    }
-    catch(err){
-        res.status(500).send({msg:err.message})
-    }
+        try{
+            let queryData= req.query
+            let blog = await blogModel.find({$and:[{ isDeleted: false }, queryData]})
+            if (blog.length == 0) {
+                return res.status(404).send({ msg: "Already Deleted" })
+            }
+            deletedTime= new Date().toISOString();
+            await blogModel.updateMany(queryData, { $set: { "isDeleted": true , "deletedAt": deletedTime} })
+            res.status(200).send({msg:"Successfully deleted"})
+    
+        } catch(error){
+            console.log(error.message)  
+            res.status(500).send({ err: error.message})
+        }
 }
 
 module.exports.deleteBlog = deleteBlog
