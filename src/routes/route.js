@@ -18,7 +18,7 @@ router.post("/blogs", blogController.createBlog)
 //The userId is sent by front end
  router.get("/blogs", blogController.getBlogs)
 
- router.put("/blogs/:blogId", blogController.updateBlog)
+ router.put("/blogs/:blogId", blogController.updateBlogbyparams)
  router.delete("/blogs/:blogId", blogController.deleteBlog)
 
 
