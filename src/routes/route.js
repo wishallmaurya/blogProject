@@ -20,7 +20,7 @@ router.post("/blogs", blogController.createBlog)
 
  router.put("/blogs/:blogId", blogController.updateBlogbyparams)
  router.delete("/blogs/:blogId", blogController.deleteBlog)
-
+ router.delete("/blogs",blogController.deleteBlogByQuery)
 
 
 
