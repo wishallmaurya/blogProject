@@ -1,5 +1,5 @@
 const authorModel = require("../models/authorModel");
-
+const jwt= require("jsonwebtoken")
 const createAuthor = async function (req, res) {
     try {
         let data = req.body;
@@ -32,4 +32,36 @@ const createAuthor = async function (req, res) {
     }
 };
 
+                                      //// Author Login ////
+const authLogin= async function(req,res){
+    let value= req.body
+    let userName= value.email
+    let password= value.password
+                                                    ////// Empty Body Validation /////
+    if(!("email" in value) || !("password" in value)) return res.status(400).send({status:"false",msg:"Pls Enter Email And Password"})
+
+                                                /// Empty Username Or Password Validation ////
+    if(userName.trim()=="" || password.trim()=="") return res.status(400).send({status:"false",msg:"Pls Provide data in Email And Password"})
+
+                                               /// Email Format Validation ///////
+    if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(userName)) return res.status(400).send({ message: "Pls Enter Email in valid Format" })
+    let author= await authorModel.findOne({$and:[{email:userName,password:password}]})
+    if(!author) return res.status(404).send({status:"false",msg:"Pls Use Valid Credentials"})
+
+    let token= jwt.sign({
+        authorId: author._id.toString()
+    },"functionup-radon")
+
+    console.log(token)
+
+    res.status(201).send({status:"Succesfully Login",token:token})
+
+}
+
+
+
+
+
+
+module.exports.authLogin=authLogin
 module.exports.createAuthor = createAuthor
