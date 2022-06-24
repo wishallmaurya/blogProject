@@ -67,70 +67,74 @@ const createBlog = async function (req, res) {
 }
 
 ///////////////////////////////////////////////////////////////////  GET BLOGS //////////////////////////////////////////////////////
-// const getBlogs= async function (req,res){
-//     let query= req.query
-    
-//     if ("authorId" in query){
-//         if(! mongoose.isValidObjectId(id)){
-//           return res.status(400).send({status:false,msg:"Pls Enter AuthorId in valiid format"})
-//         }
-//     }
-//     if(Object.keys(query).length!==0){
-//     let data= await blogModel.find({$and:[{isDeleted:false},{isPublished:true},query]})
-//     if(data.length==0) return res.status(404).send({status:"False",msg:"The Data You Found Is nOt Present"})
-//     return res.status(200).send({msg:"true",data:data})
-//     }
-//     else{
-//         let data= await blogModel.find({$and:[{isDeleted:false},{isPublished:true}]})
-//         if(!data) return res.status(404).send({msg:"The author Id that you have entered has no data which is published or not deleted"})
-//         return res.status(200).send({msg:"true",data:data})
-//     }
-// }
 const getBlogs= async function (req,res){
-    try{
-        let category= req.query.category
-        let authorId= req.query.authorId
-        let tag= req.query.tags
-        let subcategory=req.query.subcategory
-        let obj={
-            isDeleted:false,
-            isPublished:true
-        }
-        if(authorId){
-            obj.authorId= authorId
-        }
-        if(category){
-            obj.category=category
-        }
-        if(tag){
-            obj.tags=tag
-        }
-        if(subcategory){
-// //             obj.subcategory=subcategory
-// //              /no need of db call ,$all use
-//              array=trim,split .map trim
-//              obj.key=$all array
-        }
-        let data= await blogModel.find(obj)
-        if(data.length==0) {
-            return res.status(404).send({status:false,msg:"No Blog Found with provided information...Pls Check The Upper And Lower Cases Of letter"})
-        }
-        else{
-            return res.status(200).send({status:true,msg:data})
+    let query= req.query
+    
+    if ("authorId" in query){
+        if(! mongoose.isValidObjectId(id)){
+          return res.status(400).send({status:false,msg:"Pls Enter AuthorId in valiid format"})
         }
     }
-    catch(err){
-        res.status(500).send({status:false,msg:err.message})
+    if(Object.keys(query).length!==0){
+    let data= await blogModel.find({$and:[{isDeleted:false},{isPublished:true},query]})
+    if(data.length==0) return res.status(404).send({status:"False",msg:"The Data You Found Is nOt Present"})
+    return res.status(200).send({msg:"true",data:data})
+    }
+    else{
+        let data= await blogModel.find({$and:[{isDeleted:false},{isPublished:true}]})
+        if(!data) return res.status(404).send({msg:"The author Id that you have entered has no data which is published or not deleted"})
+        return res.status(200).send({msg:"true",data:data})
     }
 }
+// const getBlogs= async function (req,res){
+//     try{
+//         let category= req.query.category
+//         let authorId= req.query.authorId
+//         let subcategory=req.query.subcategory
+//         let tags= req.query.tags
+//         let array= tags.replace(/\s+/g,'').trim().split()
+//         console.log(array)
+//         let obj={
+//             isDeleted:false,
+//             isPublished:true
+//         }
+//         if(authorId){
+//             obj.authorId= authorId
+//         }
+//         if(category){
+//             obj.category=category
+//         }
+//         if(tags){
+//             obj.tags={$all :[array]}
+//         }
+//         if(subcategory){
+//             obj.subcategory=subcategory
+// // //              /no need of db call ,$all use
+// //              array=trim,split .map trim
+// //              obj.key=$all array
+//         }
+//         let data= await blogModel.find(obj)
+//         if(data.length==0) {
+//             return res.status(404).send({status:false,msg:"No Blog Found with provided information...Pls Check The Upper And Lower Cases Of letter"})
+//         }
+//         else{
+            
+//             return res.status(200).send({status:true,msg:data})
+//         }
+//     }
+//     catch(err){
+//         console.log(err)
+//         res.status(500).send({status:false,msg:err.message})
+//     }
+// }
 ////////////////////////////////////////////////////////  updateblog //////////////////////////////////////////////////////////////////////////
 const updateBlogbyparams= async function(req,res){
     try{
 
         let id= req.params.blogId
         let findId= await blogModel.findById(id)
-        if(!findId) res.status(400).send({status:"False",message:"The Id You Have Entered Doesn't Exists"})
-        if(findId.isDeleted==true) res.status(400).send({msg:"The Id You Have Entered Is already deleted"})
+        if(!findId) return res.status(400).send({status:"False",message:"The Id You Have Entered Doesn't Exists"})
+        if(findId.isDeleted==true) return res.status(400).send({msg:"The Id You Have Entered Is already deleted"})
         let data= req.body
         published= new Date().toISOString()
         if(data.body.trim().length == 0 || data.category.trim().length == 0 || data.title.trim().length == 0 || data.subcategory.trim().length == 0) return res.status(400).send({msg:"Pls Add Data In Attributes..Dont left it empty"})
@@ -152,11 +156,11 @@ const updateBlogbyparams= async function(req,res){
                 subcategory: req.body.subcategory
             }
         }, { new: true})
-        res.status(201).send({staus:"True",data:updatedBlog})
+       return res.status(201).send({staus:"True",data:updatedBlog})
     }
     catch(err){
         console.log(err)
-        res.status(500).send({status:"False",msg:err.message})
+      return  res.status(500).send({status:"False",msg:err.message})
     }
 }
 //////////////////////////////////////////////////  deleteblog by params 
