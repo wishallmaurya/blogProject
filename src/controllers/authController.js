@@ -8,6 +8,7 @@ const { isValidEmail,
 const createAuthor = async function (req, res) {
     try {
         let data = req.body;
+        let title= data.title
         if (Object.keys(data).length == 0) {
             return res.status(400).send({ msg: "Body should not be empty" })
         }
@@ -27,7 +28,7 @@ const createAuthor = async function (req, res) {
         if (!isValidName(data.fname)) return res.status(400).send({ status:false,msg: "Pls Enter Valid First Name" })
 
         if(!isValid(data.title)) return res.status(400).send({status:false, msg: "The Title Attributes should not be empty" })
-        if(!isValidTitle(data.title)) return res.status(400).send({status:false,msg:"Pls Use A-Z or a-z or 0-9 While Entering Title"})
+        if ({title: {$nin :["Mr","Mrs","Miss"]}}) return res.status(400).send({status:false,msg:"Pls use Mr,Mrs,Miss in title"})
 
        
 
@@ -62,10 +63,6 @@ const authLogin = async function (req, res) {
     res.status(201).send({ status: "Succesfully Login", token: token })
 
 }
-
-
-
-
 
 
 module.exports.authLogin = authLogin

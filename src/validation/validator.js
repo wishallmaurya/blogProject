@@ -19,10 +19,13 @@ const isValidTitle=(title)=>{
     if(/^[a-zA-Z]+(([',. -][a-zA-Z0-9 ])?[a-zA-Z0-9]*)*$/.test(title))
     return true
 }
+const isValidBody=(body)=>{
+    if(!/^[a-zA-Z]+(([',. -][a-zA-Z0-9 ])?[a-zA-Z0-9]*)*$/.test(body))
+    return true
+}
 
 
 
 
 
-
-module.exports={isValidEmail,isValidName,isValid,isValidPassword,isValidTitle}
+module.exports={isValidEmail,isValidName,isValid,isValidPassword,isValidTitle,isValidBody}

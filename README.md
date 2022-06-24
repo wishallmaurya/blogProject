@@ -95,3 +95,4 @@ Blogs
 }
 Refer https://jsonplaceholder.typicode.com/guide/ for some fake blogs data.
 Note: Create a group database and use the same database in connection string by replacing `groupXDatabase
+if(!isValidTitle(data.title)) return res.status(400).send({status:false,msg:"Pls Use A-Z or a-z or 0-9 While Entering Title"})

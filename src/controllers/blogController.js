@@ -1,19 +1,13 @@
 const blogModel = require("../models/blogModel")
 const authorModel = require("../models/authorModel");
 const mongoose= require("mongoose")
-// POST /blogs
-// Create a blog document from request body. Get authorId in request body only.
-
-// Make sure the authorId is a valid authorId by checking the author exist in the authors collection.
-
-// Return HTTP status 201 on a succesful blog creation. Also return the blog document. The response should be a JSON object like this
-
-// Create atleast 5 blogs for each author
-
-// Return HTTP status 400 for an invalid request with a response body like this
+const { isValidEmail,
+    isValidName,
+    isValid,isValidPassword,isValidTitle,isValidBody} = require("../validation/validator")
 
 
- ////////////////////////////////////////////////////  POST BLOG API
+
+ //................................................................  POST BLOG API
 const createBlog = async function (req, res) {
     try {
         let data = req.body
@@ -26,24 +20,23 @@ const createBlog = async function (req, res) {
         //////////////////////////////////////////  Required Fields validation
         if(!("authorId" in data) || !("title" in data) || !("body" in data) || !("category" in data) ) return res.status(400).send({msg:"The (authorId , title , body , category) fields are required"})
 
-        //////////////////////////////////////////  Required field Empty validation
-        if(data.authorId.trim() == "" || data.title.trim() == "" || data.body.trim() == "" || data.category.trim() == "") return res.status(400).send({msg:"The required fields must not be empty"})
+        if (!isValid(data.authorId)) return res.status(400).send({status:false,msg:"Pls Add AuthorId In Authorid Attribute"})
+        if(!mongoose.isValidObjectId(data.authorId)) return res.status(400).send({status:false,msg:"Pls Enter AuthorId In Valid Format"})
         
-        /////////////////////////////////////////   AuthorId format Validation
-        if (!/^[a-f\d]{24}$/i.test(iD) ) return res.status(400).send({msg:"Pls enter AuthorId in required format"})
+        //.......................................... Title Validation
+        if(!isValid(data.title)) return res.status(400).send({status:false,msg:"Pls Add Title In Title Attribute"})
+        if(!isValidTitle(data.title))return res.status(400).send({status:false,msg:"Pls Use A-Z or a-z and 0-9 While Entering Title "})
     
-
-        ////////////////////////////////////////  Category Validation
-        if(!/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/.test(data.category))   return res.status(400).send({msg:"Pls Enter Category In OnLy String"})
-
-        /////////////////////////////////////////// title validation 
-        if(!/^[a-zA-Z]+(([',. -][a-zA-Z0-9 ])?[a-zA-Z0-9]*)*$/.test(data.title)) return res.status(400).send({msg:"Pls Use A-Z or a-z or 0-9 While Entering Title "})
-
-        //////////////////////////////////////////  Body Validation
-        if(!/^[a-zA-Z]+(([',. -][a-zA-Z0-9 ])?[a-zA-Z0-9]*)*$/.test(data.body)) return res.status(400).send({msg:"Pls Use A-Z or a-z or 0-9 While Entering Body "})
+        //...............................................  Category Validation
+        if(!isValid(data.category))  return res.status(400).send({status:false,msg:"Pls Add Category In Category Attribute"})
+        if(!isValidName(data.category))return res.status(400).send({ status:false,msg:"Pls Enter Category In OnLy String"})
+        
+        //................................................  Body Validation
+        if(!isValid(data.body))return res.status(400).send({status:false,msg:"Pls Add some Data In Body Attribute"})
+        if(!isValidBody(data.body)) return res.status(400).send({status:false,msg:"Pls Use A-Z or a-z and 0-9 While Entering Body "})
 
         let authId= await authorModel.findById(iD)
-        if(!authId) return res.status(400).send({msg:"The AuthorId That You Have Written Is Invalid"})
+        if(!authId) return res.status(400).send({status:false,msg:"The AuthorId That You Have Written Is Invalid"})
         if(data.isPublished==true ){
             publishedAt= new Date().toISOString();
             data.publishedAt= publishedAt
@@ -66,7 +59,7 @@ const createBlog = async function (req, res) {
     }
 }
 
-///////////////////////////////////////////////////////////////////  GET BLOGS //////////////////////////////////////////////////////
+//...................................................... GET BLOGS 
 const getBlogs= async function (req,res){
     let query= req.query
     
