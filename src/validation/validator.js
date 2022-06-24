@@ -20,7 +20,7 @@ const isValidTitle=(title)=>{
     return true
 }
 const isValidBody=(body)=>{
-    if(!/^[a-zA-Z]+(([',. -][a-zA-Z0-9 ])?[a-zA-Z0-9]*)*$/.test(body))
+    if(/^[a-zA-Z]+(([',. -][a-zA-Z0-9 ])?[a-zA-Z0-9]*)*$/.test(body))
     return true
 }
 

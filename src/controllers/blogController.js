@@ -12,6 +12,8 @@ const createBlog = async function (req, res) {
     try {
         let data = req.body
          let iD= data.authorId
+         let published= data.isPublished
+         let deleted= data.isDeleted
         // let title= data.title
         // let body=data.body
         // let category=data.category
@@ -33,7 +35,13 @@ const createBlog = async function (req, res) {
         
         //................................................  Body Validation
         if(!isValid(data.body))return res.status(400).send({status:false,msg:"Pls Add some Data In Body Attribute"})
+
         if(!isValidBody(data.body)) return res.status(400).send({status:false,msg:"Pls Use A-Z or a-z and 0-9 While Entering Body "})
+        if(data.tags.length==0 || !isValidBody(data.tags)) return res.status(400).send({status:false,msg:"Dont Left Tag Array Empty either give some tags or either remove it (Add Only Alphabetical String)"})
+
+        if(data.subcategory.length==0 || !isValidBody(data.subcategory)) return res.status(400).send({status:false,msg:"Dont Left Subcategory Array Empty either give some Subcategory or either remove it (Add Only Alphabetical String)"})
+        
+        if(data.published !== Boolean) return res.status(400).send({status:false,msg:"Pls Use Only Boolean Values Like (true,false,1,0,'yes','no')"})
 
         let authId= await authorModel.findById(iD)
         if(!authId) return res.status(400).send({status:false,msg:"The AuthorId That You Have Written Is Invalid"})
@@ -62,12 +70,12 @@ const createBlog = async function (req, res) {
 //...................................................... GET BLOGS 
 const getBlogs= async function (req,res){
     let query= req.query
-    
-    if ("authorId" in query){
-        if(! mongoose.isValidObjectId(id)){
-          return res.status(400).send({status:false,msg:"Pls Enter AuthorId in valiid format"})
-        }
-    }
+    let Id= req.query.authorId
+    // if ("authorId" in query){
+    //     if(! mongoose.isValidObjectId(Id)){
+    //       return res.status(400).send({status:false,msg:"Pls Enter AuthorId in valiid format"})
+    //     }
+    // }
     if(Object.keys(query).length!==0){
     let data= await blogModel.find({$and:[{isDeleted:false},{isPublished:true},query]})
     if(data.length==0) return res.status(404).send({status:"False",msg:"The Data You Found Is nOt Present"})
@@ -81,32 +89,19 @@ const getBlogs= async function (req,res){
 }
 // const getBlogs= async function (req,res){
 //     try{
-//         let category= req.query.category
-//         let authorId= req.query.authorId
-//         let subcategory=req.query.subcategory
-//         let tags= req.query.tags
-//         let array= tags.replace(/\s+/g,'').trim().split()
-//         console.log(array)
-//         let obj={
-//             isDeleted:false,
-//             isPublished:true
-//         }
+//          let authorId= req.query.authorId
 //         if(authorId){
-//             obj.authorId= authorId
+//             let id= await authorModel.findById({_id:authorId})
+//              if(!id) return res.status(400).send({status:false,msg:"The AuthorId You Have entered is invalid"})
+        
 //         }
-//         if(category){
-//             obj.category=category
-//         }
-//         if(tags){
-//             obj.tags={$all :[array]}
-//         }
-//         if(subcategory){
-//             obj.subcategory=subcategory
-// // //              /no need of db call ,$all use
-// //              array=trim,split .map trim
-// //              obj.key=$all array
-//         }
-//         let data= await blogModel.find(obj)
+        
+// // ///no need of db call ,$all use
+// // array=trim,split .map trim
+// //obj.key=$all array
+       
+//         // let data= await blogModel.find(obj)
+//         let data=await blogModel.find({ isDeleted: false, isPublished: true, $or: [{ authorId: authorId }, { tags: req.query.tags }, { category: req.query.category }, { subcategory: req.query.subcategory }] })
 //         if(data.length==0) {
 //             return res.status(404).send({status:false,msg:"No Blog Found with provided information...Pls Check The Upper And Lower Cases Of letter"})
 //         }

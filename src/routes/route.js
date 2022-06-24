@@ -13,7 +13,7 @@ const middl=require("../middlewares/middleware")
 
 router.post("/authors", authController.createAuthor)
 
-router.post("/blogs",middl.authentication, blogController.createBlog)
+router.post("/blogs",middl.authentication,middl.auth2, blogController.createBlog)
 
 //The userId is sent by front end
  router.get("/blogs",middl.authentication, blogController.getBlogs)
