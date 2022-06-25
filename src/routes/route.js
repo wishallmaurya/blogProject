@@ -1,26 +1,31 @@
-// Author APIs /authors
-// Create an author - atleast 5 authors
-// Create a author document from request body. Endpoint: BASE_URL/authors
-
 const express = require('express');
 const router = express.Router();
-
-
+//....................Controllers
 const authController= require("../controllers/authController")
 const blogController= require("../controllers/blogcontroller")
+
+//....................Middlewares
 const middl=require("../middlewares/middleware")
 
-
+//....................Create Author
 router.post("/authors", authController.createAuthor)
 
+//....................Create Blogs
 router.post("/blogs",middl.authentication,middl.auth2, blogController.createBlog)
 
-//The userId is sent by front end
+//...................Get List Of Blogs
  router.get("/blogs",middl.authentication, blogController.getBlogs)
 
+//..................Update Blogs By Path params
  router.put("/blogs/:blogId",middl.authentication,middl.authorisation, blogController.updateBlogbyparams)
+
+ //.................Delete Blogs By Path Params
  router.delete("/blogs/:blogId",middl.authentication,middl.authorisation, blogController.deleteBlog)
- router.delete("/blogs",middl.authentication,middl.authorisation,blogController.deleteBlogByQuery)
+
+ //..................Delete Blogs By Query Params
+ router.delete("/blogs",middl.authentication,blogController.deleteBlogByQuery)
+
+ //..................Login An Author
  router.post("/login",authController.authLogin)
 
 
