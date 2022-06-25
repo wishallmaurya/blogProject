@@ -31,6 +31,7 @@ const authorisation = async function (req,res,next){
     
     let userIdFromParams= req.params.blogId
     let authId= await blogModel.findById(userIdFromParams)
+    if(!authId) return res.status(400).send({status:false,msg:"The Id You Have Entered Doesnt Exists, Or Check Can u Pass Only blogId"})
     if(decodedtoken.authorId ==authId.authorId) {
         next()
     }

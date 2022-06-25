@@ -122,10 +122,9 @@ const updateBlogbyparams = async function (req, res) {
         if (findId.isDeleted == true) return res.status(400).send({ msg: "The Id You Have Entered Is already deleted" })
         let data = req.body
         published = new Date().toISOString()
-        if (data.body.trim().length == 0 || data.category.trim().length == 0 || data.title.trim().length == 0 || data.subcategory.trim().length == 0) return res.status(400).send({ msg: "Pls Add Data In Attributes..Dont left it empty" })
-
-        if (!isValidTitle(data.title)) return res.status(400).send({ msg: "Pls Use A-Z or a-z or 0-9 While Entering Title " })
-        if (!isValidTitle(data.tags)) return res.status(400).send({ msg: "pleas enter valid tag" })
+       
+        if (!isValidTitle(data.title)) return res.status(400).send({ status:false,msg: "Pls Use A-Z or a-z or 0-9 While Entering Title " })
+        if (!isValidTitle(data.tags)) return res.status(400).send({ status:false,msg: "pleas enter valid tag" })
 
         if (Object.keys(data).length == 0) return res.status(400).send({ status: "false", msg: "Pls Enter Some Data To be updated in body" })
 
