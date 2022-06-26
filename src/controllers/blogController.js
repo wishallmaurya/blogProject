@@ -1,6 +1,7 @@
 const blogModel = require("../models/blogModel")
 const authorModel = require("../models/authorModel");
 const mongoose = require("mongoose")
+const middl=require("../middlewares/middleware")
 const { isValidEmail,
     isValidName,
     isValid, isValidPassword, isValidTitle, isValidBody } = require("../validation/validator")
@@ -13,7 +14,6 @@ const createBlog = async function (req, res) {
         let data = req.body
         let iD = data.authorId
         let published = data.isPublished
-        let deleted = data.isDeleted
 
 
         //...........................................  Required Fields validation
@@ -39,8 +39,7 @@ const createBlog = async function (req, res) {
 
         if (data.subcategory.length == 0 || !isValidBody(data.subcategory)) return res.status(400).send({ status: false, msg: "Dont Left Subcategory Array Empty either give some Subcategory or either remove it (Add Only Alphabetical String)" })
 
-        if (published !== Boolean) return res.status(400).send({ status: false, msg: "Pls Use Only Boolean Values Like (true,false,1,0,'yes','no')" })
-
+        
         let authId = await authorModel.findById(iD)
         if (!authId) return res.status(400).send({ status: false, msg: "The AuthorId That You Have Written Is Invalid" })
         if (data.isPublished == true) {
@@ -212,6 +211,8 @@ const deleteBlogByQuery = async function (req, res) {
         let deletedTime = new Date().toISOString();
         let blog = await blogModel.findOne(obj)
         if (!blog) return res.status(400).send({ status: false, msg: "Sorry No Blog Found either check the Upper and Lower case of Letters" })
+        console.log(blog.authorId)
+        if(blog.authorId!==middl.authentication.decodedtoken) return res.send({status:false,msg:"Sorry You Are not Authorise to do this...else check your header or pass only that query which belongs to your authorId"})
         if (blog.isDeleted == true) return res.status(200).send({ staus: true, msg: "This is Already Deleted" })
         if (Object.keys(blog).length > 0) {
             let data = await blogModel.findOneAndUpdate(obj, { $set: { "isDeleted": true, "deletedAt": deletedTime } }, { new: true })

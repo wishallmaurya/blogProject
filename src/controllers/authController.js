@@ -9,6 +9,7 @@ const { auth2 } = require("../middlewares/middleware");
 const createAuthor = async function (req, res) {
     try {
         let data = req.body;
+        let email= data.email
         let title = data.title;
         if (Object.keys(data).length == 0) {
             return res.status(400).send({ msg: "Body should not be empty" })
@@ -29,10 +30,9 @@ const createAuthor = async function (req, res) {
         if (!isValidName(data.fname)) return res.status(400).send({ status: false, msg: "Pls Enter Valid First Name" })
 
         if (!isValid(data.title)) return res.status(400).send({ status: false, msg: "The Title Attributes should not be empty" })
-        if ( {title :{ $nin: ["Mr", "Mrs", "Miss"] }} ) return res.status(400).send({ status: false, msg: "Pls use Mr,Mrs,Miss in title" })
-     
-
-
+        
+        let checkunique= await authorModel.find({email:email}) 
+        if(checkunique) return res.status(400).send({status:false,msg:"This Email Id Already Exists Pls Use Another"})
         let savedData = await authorModel.create(data);
         res.status(201).send({ status: "True", data: savedData });
     }
