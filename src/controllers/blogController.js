@@ -18,7 +18,7 @@ const createBlog = async function (req, res) {
 
         //...........................................  Required Fields validation
         if (!("authorId" in data) || !("title" in data) || !("body" in data) || !("category" in data)) return res.status(400).send({ msg: "The (authorId , title , body , category) fields are required" })
-        
+
         //............................................Empty Validation And AuthorId Format Validation
         if (!isValid(data.authorId)) return res.status(400).send({ status: false, msg: "Pls Add AuthorId In Authorid Attribute" })
         if (!mongoose.isValidObjectId(data.authorId)) return res.status(400).send({ status: false, msg: "Pls Enter AuthorId In Valid Format" })
@@ -39,7 +39,7 @@ const createBlog = async function (req, res) {
 
         if (data.subcategory.length == 0 || !isValidBody(data.subcategory)) return res.status(400).send({ status: false, msg: "Dont Left Subcategory Array Empty either give some Subcategory or either remove it (Add Only Alphabetical String)" })
 
-        // if (data.isPublished==Boolean) return res.status(400).send({ status: false, msg: "Pls Use Only Boolean Values Like (true,false,1,0,'yes','no')" })
+        if (published !== Boolean) return res.status(400).send({ status: false, msg: "Pls Use Only Boolean Values Like (true,false,1,0,'yes','no')" })
 
         let authId = await authorModel.findById(iD)
         if (!authId) return res.status(400).send({ status: false, msg: "The AuthorId That You Have Written Is Invalid" })
@@ -122,11 +122,26 @@ const updateBlogbyparams = async function (req, res) {
         if (findId.isDeleted == true) return res.status(400).send({ msg: "The Id You Have Entered Is already deleted" })
         let data = req.body
         published = new Date().toISOString()
-       
-        if (!isValidTitle(data.title)) return res.status(400).send({ status:false,msg: "Pls Use A-Z or a-z or 0-9 While Entering Title " })
-        if (!isValidTitle(data.tags)) return res.status(400).send({ status:false,msg: "pleas enter valid tag" })
 
         if (Object.keys(data).length == 0) return res.status(400).send({ status: "false", msg: "Pls Enter Some Data To be updated in body" })
+        if ("tags" in data) {
+            if (!isValid(data.tags)) return res.status(400).send({ status: false, msg: "Dont left tag attribute empty" })
+            if (!isValidTitle(data.tags)) return res.status(400).send({ status: false, msg: "pleas enter valid tag" })
+        }
+        if ("body" in data) {
+            if (!isValid(data.body)) return res.status(400).send({ status: false, msg: "Dont Left the body attribute empty" })
+        }
+        if ("title" in data) {
+            if (!isValid(data.title)) return res.status(400).send({ status: false, msg: "Dont Left the title attribute empty" })
+            if (!isValidTitle(data.title)) return res.status(400).send({ status: false, msg: "Pls Use A-Z or a-z and 0-9 While Entering Title " })
+        }
+        if ("category" in data) {
+            if (!isValid(data.category)) return res.status(400).send({ status: false, msg: "Dont Left the category attribute empty" })
+        }
+        if ("subcategory" in data) {
+            if (!isValid(data.subcategory)) return res.status(400).send({ status: false, msg: "Dont Left the subcategory attribute empty" })
+            if (!isValidTitle(data.subcategory)) return res.status(400).send({ status: false, msg: "Pls Use A-Z or a-z and 0-9 While Entering subcategory and not add empty white spaces " })
+        }
 
         let updatedBlog = await blogModel.findOneAndUpdate({ _id: id }, {
             $set: {
@@ -169,14 +184,14 @@ const deleteBlog = async function (req, res) {
 
 const deleteBlogByQuery = async function (req, res) {
     try {
-        const {authorId,category,tags,subcategory,isPublished}= req.query
+        const { authorId, category, tags, subcategory, isPublished } = req.query
         let obj = {}
         if (tags) {
-            if(tags.trim().length==0) return res.status(400).send({status:false,msg:"Dont Left The Tag query empty"})
-            obj.tags = {$all:tags.trim().split(",").map(e=>e.trim())}
+            if (tags.trim().length == 0) return res.status(400).send({ status: false, msg: "Dont Left The Tag query empty" })
+            obj.tags = { $all: tags.trim().split(",").map(e => e.trim()) }
         }
         if (category) {
-            if(category.trim().length==0) return res.status(400).send({status:false,msg:"Dont Left The category query empty"})
+            if (category.trim().length == 0) return res.status(400).send({ status: false, msg: "Dont Left The category query empty" })
             obj.category = category
         }
         if (authorId) {
@@ -188,19 +203,19 @@ const deleteBlogByQuery = async function (req, res) {
         }
         if (subcategory) {
             if (subcategory.trim().length == 0) return res.status(400).send({ status: false, msg: "Dont Left subcategory Query Empty" })
-            obj.subcategory = {$all:subcategory.trim().split(",").map(e=>e.trim())}
+            obj.subcategory = { $all: subcategory.trim().split(",").map(e => e.trim()) }
         }
         if (isPublished) {
-            if (isPublished.trim().length==0) return res.status(400).send({ status: false, msg: "Dont Left isPublished Query Empty" })
+            if (isPublished.trim().length == 0) return res.status(400).send({ status: false, msg: "Dont Left isPublished Query Empty" })
             obj.isPublished = isPublished
         }
         let deletedTime = new Date().toISOString();
         let blog = await blogModel.findOne(obj)
-        if(!blog) return res.status(400).send({status:false,msg:"Sorry No Blog Found either check the Upper and Lower case of Letters"})
-        if(blog.isDeleted==true) return res.status(200).send({staus:true,msg:"This is Already Deleted"})
-        if (Object.keys(blog).length> 0) {
-            let data =await blogModel.findOneAndUpdate(obj, { $set: { "isDeleted": true, "deletedAt": deletedTime }},{new:true})
-            return res.status(200).send({ status: true, msg: "SuccesFully Deleted" ,blog:data})
+        if (!blog) return res.status(400).send({ status: false, msg: "Sorry No Blog Found either check the Upper and Lower case of Letters" })
+        if (blog.isDeleted == true) return res.status(200).send({ staus: true, msg: "This is Already Deleted" })
+        if (Object.keys(blog).length > 0) {
+            let data = await blogModel.findOneAndUpdate(obj, { $set: { "isDeleted": true, "deletedAt": deletedTime } }, { new: true })
+            return res.status(200).send({ status: true, msg: "SuccesFully Deleted", blog: data })
         }
         else {
             res.status(400).send({ status: false, msg: "No such Blog Found" })
