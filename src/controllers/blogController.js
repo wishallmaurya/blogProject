@@ -2,6 +2,7 @@ const blogModel = require("../models/blogModel")
 const authorModel = require("../models/authorModel");
 const mongoose = require("mongoose")
 const middl=require("../middlewares/middleware")
+
 const { isValidEmail,
     isValidName,
     isValid, isValidPassword, isValidTitle, isValidBody } = require("../validation/validator")
@@ -212,6 +213,7 @@ const deleteBlogByQuery = async function (req, res) {
         let blog = await blogModel.findOne(obj)
         if (!blog) return res.status(400).send({ status: false, msg: "Sorry No Blog Found either check the Upper and Lower case of Letters" })
         console.log(blog.authorId)
+        
         if(blog.authorId!==middl.authentication.decodedtoken) return res.send({status:false,msg:"Sorry You Are not Authorise to do this...else check your header or pass only that query which belongs to your authorId"})
         if (blog.isDeleted == true) return res.status(200).send({ staus: true, msg: "This is Already Deleted" })
         if (Object.keys(blog).length > 0) {

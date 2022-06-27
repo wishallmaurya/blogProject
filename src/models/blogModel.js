@@ -48,5 +48,4 @@ const blogSchema= new mongoose.Schema({
 
 module.exports=mongoose.model("Blog",blogSchema)
 
-const d = new Date();
-let text = d.toISOString();
+
