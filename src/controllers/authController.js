@@ -1,17 +1,14 @@
 const authorModel = require("../models/authorModel");
 const jwt = require("jsonwebtoken")
-const { isValidEmail,
-    isValidName,
-    isValid, isValidPassword, isValidTitle } = require("../validation/validator");
-const { auth2 } = require("../middlewares/middleware");
+const { isValidEmail, isValidName,isValid, isValidPassword, } = require("../validation/validator");
 
 
 const createAuthor = async function (req, res) {
     try {
         let data = req.body;
-    
+        let {title} = req.body
         if (Object.keys(data).length == 0) {
-            return res.status(400).send({ msg: "Body should not be empty" })
+            return res.status(400).send({status: false, msg: "Body should not be empty" })
         }
 
         if (!("fname" in data) || !("lname" in data) || !("title" in data) || !("email" in data) || !("password" in data)) return res.status(400).send({ msg: "fname,lname,title,email,password are required" })
@@ -29,15 +26,21 @@ const createAuthor = async function (req, res) {
         if (!isValidName(data.fname)) return res.status(400).send({ status: false, msg: "Pls Enter Valid First Name" })
 
         if (!isValid(data.title)) return res.status(400).send({ status: false, msg: "The Title Attributes should not be empty" })
-        
+        if (title !== "Mr") {
+            if (title !== "Mrs") {
+                if (title !== "Miss") {
+                    return res.status(400).send({ status: false, message: "Should be Mr , Mrs , Miss" })
+                }
+            }
+        }
         let checkunique= await authorModel.findOne({email:req.body.email}) 
         if (checkunique) return res.status(400).send({status:false,msg:"This Email Id Already Exists Pls Use Another"})
         let savedData = await authorModel.create(data);
-        res.status(201).send({ status: "True", data: savedData });
+        res.status(201).send({ status: true, data: savedData });
     }
 
     catch (error) {
-        return res.status(500).send({ status: "False", msg: error.message })
+        return res.status(500).send({ status: false, msg: error.message })
     }
 };
 
@@ -47,13 +50,13 @@ const authLogin = async function (req, res) {
     let userName = value.email
     let password = value.password
     //................................................... Empty Body Validation 
-    if (!("email" in value) || !("password" in value)) return res.status(400).send({ status: "false", msg: "Pls Enter Email And Password" })
+    if (!("email" in value) || !("password" in value)) return res.status(400).send({ status: false, msg: "Pls Enter Email And Password" })
 
     //....................................................Empty Attributes Validation
-    if (!isValid(userName) || !isValid(password)) return res.status(400).send({ status: "false", msg: "Pls Provide data in Email And Password" })
+    if (!isValid(userName) || !isValid(password)) return res.status(400).send({ status: false, msg: "Pls Provide data in Email And Password" })
 
     let author = await authorModel.findOne({ $and: [{ email: userName, password: password }] })
-    if (!author) return res.status(404).send({ status: "false", msg: "Pls Use Valid Credentials" })
+    if (!author) return res.status(404).send({ status: false, msg: "Pls Use Valid Credentials" })
 
     let token = jwt.sign({
         authorId: author._id.toString()

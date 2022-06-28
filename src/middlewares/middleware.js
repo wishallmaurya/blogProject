@@ -6,7 +6,7 @@ const authentication= async function(req,res,next){
     if(!token) token= req.headers["x-api-key"]
 
     //If no token is present in the request header return error
-    if (!token) return res.send({ status: false, msg: "token must be present" }); 
+    if (!token) return res.status(400).send({ status: false, msg: "token must be present" }); 
 
     let decodedtoken= jwt.verify(token,"functionup-radon")
 
@@ -24,7 +24,7 @@ const authorisation = async function (req,res,next){
     if(!token) token= req.headers["x-api-key"]
 
     //If no token is present in the request header return error
-    if (!token) return res.send({ status: false, msg: "token must be present" }); 
+    if (!token) return res.status(400).send({ status: false, msg: "token must be present" }); 
 
     let decodedtoken= jwt.verify(token,"functionup-radon")
     console.log(decodedtoken.authorId)
@@ -47,7 +47,7 @@ const auth2= async function(req,res,next){
     if(!token) token= req.headers["x-api-key"]
 
     //If no token is present in the request header return error
-    if (!token) return res.send({ status: false, msg: "token must be present" }); 
+    if (!token) return res.status(400).send({ status: false, msg: "token must be present" }); 
 
     let decodedtoken= jwt.verify(token,"functionup-radon")
     console.log(decodedtoken.authorId)
@@ -60,29 +60,6 @@ const auth2= async function(req,res,next){
     }
 }
 
-// const auth4delByquery= async function(req,res,next){
-//     let token= req.headers["X-Api-key"];
-//     if(!token) token= req.headers["x-api-key"]
-
-//     //If no token is present in the request header return error
-//     if (!token) return res.send({ status: false, msg: "token must be present" }); 
-
-//     let decodedtoken= jwt.verify(token,"functionup-radon")
-//     console.log(decodedtoken.authorId)
-//     id= req.query.authorId
-//     if (authorId in req.query){
-//         if(id===decodedtoken.authorId)     
-//         next()
-//     }
-//     else{
-//         res.send
-//     }
-// else{
-//     return res.status(400).send({status:false,msg:"Sorry You Are Not Authorise To Do this Because The entered id and Login id is not same "})
-// }
-// }
-
-// module.exports.auth4delByquery=auth4delByquery
 module.exports.auth2=auth2
 module.exports.authentication=authentication
 module.exports.authorisation=authorisation
