@@ -1,14 +1,14 @@
 const authorModel = require("../models/authorModel");
 const jwt = require("jsonwebtoken")
-const { isValidEmail,isValidName,isValid, isValidPassword, } = require("../validation/validator");
+const { isValidEmail, isValidName,isValid, isValidPassword, } = require("../validation/validator");
 
 
 const createAuthor = async function (req, res) {
     try {
         let data = req.body;
-        const {title} = req.body
+        let {title} = req.body
         if (Object.keys(data).length == 0) {
-            return res.status(400).send({ msg: "Body should not be empty" })
+            return res.status(400).send({status: false, msg: "Body should not be empty" })
         }
 
         if (!("fname" in data) || !("lname" in data) || !("title" in data) || !("email" in data) || !("password" in data)) return res.status(400).send({status:false, msg: "fname,lname,title,email,password are required" })
@@ -29,15 +29,14 @@ const createAuthor = async function (req, res) {
         if (title !== "Mr") {
             if (title !== "Mrs") {
                 if (title !== "Miss") {
-                    return res.status(400).send({ status: false, msg: "Title Should be Mr , Mrs , Miss" })
+                    return res.status(400).send({ status: false, message: "Should be Mr , Mrs , Miss" })
                 }
             }
         }
-        
         let checkunique= await authorModel.findOne({email:req.body.email}) 
         if (checkunique) return res.status(400).send({status:false,msg:"This Email Id Already Exists Pls Use Another"})
         let savedData = await authorModel.create(data);
-        res.status(201).send({ status: true,msg:"Author Created Successfully", data: savedData });
+        res.status(201).send({ status: true, data: savedData });
     }
 
     catch (error) {

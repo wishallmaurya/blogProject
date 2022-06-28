@@ -60,7 +60,6 @@ const auth2= async function(req,res,next){
     }
 }
 
-
 module.exports.auth2=auth2
 module.exports.authentication=authentication
 module.exports.authorisation=authorisation
